@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,16 +9,42 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
-  void _login() {
-    // Simple validation - in a real app, you'd authenticate here
-    if (_usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-      Navigator.pushNamed(context, '/home');
+  void _login() async {
+    if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Attempt to sign in with Firebase Auth
+      try {
+        final user = await _authService.signInWithEmailAndPassword(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+        if (user != null) {
+          Navigator.pushNamed(context, '/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login failed. Please check your credentials.')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter username and password')),
+        const SnackBar(content: Text('Please enter email and password')),
       );
     }
   }
@@ -70,10 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 32),
                     TextField(
-                      controller: _usernameController,
+                      controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'Username',
-                        prefixIcon: const Icon(Icons.person),
+                        labelText: 'Email',
+                        prefixIcon: const Icon(Icons.email),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -100,17 +127,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _login,
+                        onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(fontSize: 18),
-                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                                'Login',
+                                style: TextStyle(fontSize: 18),
+                              ),
                       ),
                     ),
                   ],
