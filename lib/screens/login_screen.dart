@@ -27,20 +27,28 @@ class _LoginScreenState extends State<LoginScreen> {
           _passwordController.text,
         );
         if (user != null) {
-          Navigator.pushNamed(context, '/home');
+          if (mounted) {
+            Navigator.pushNamed(context, '/home');
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login failed. Please check your credentials.')),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login failed. Please check your credentials.')),
+            );
+          }
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
