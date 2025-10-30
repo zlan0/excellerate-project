@@ -1,5 +1,9 @@
 # LearnLoop: A Smart Learning Companion
 
+# Login paswword 
+# email: groupall@gmail.com    
+# password:passwordgroup1
+
 ## Purpose of the App
 
 LearnLoop is designed to simplify and personalize the digital learning experience for both learners and administrators. It provides an intuitive, mobile-first platform where learners can access interactive courses, track progress, and receive real-time feedback while admins can easily manage users, content, and analytics.
